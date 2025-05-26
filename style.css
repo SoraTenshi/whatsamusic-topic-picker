@@ -135,6 +135,7 @@ button[disabled] {
   cursor: pointer;
   user-select: text;
   position: relative;
+  justify-content: space-between;
 }
 
 #output:hover {
@@ -146,9 +147,6 @@ button[disabled] {
 }
 
 .copy-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   background: #565f89;
   border: none;
   border-radius: 4px;
