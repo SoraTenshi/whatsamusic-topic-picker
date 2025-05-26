@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>whatsamusic topic picker</title>
+  <head id="head">
+    <script src="https://cdn.jsdelivr.net/npm/@jcubic/lips@beta/dist/lips.min.js" data-bootstrap></script>
+    <script type="text/x-scheme" src="impl.scm"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="fieldset" id="fieldset">
+      <fieldset>
+        <legend>Options:</legend>
+        <div>
+          <input type="checkbox" id="nsfw" name="nsfw">
+          <label for="nsfw">NSFW</label>
+        </div>
+        <div>
+          <input type="checkbox" id="spotify" name="spotify">
+          <label for="spotify">Spotify</label>
+        </div>
+      </fieldset>
+      <div class="buttons">
+        <button class="generate" id="generate" type="button">Generate</button>
+        <button class="clear" id="clear" type="button">Clear Caches</button>
+      </div>
+      <span id="output">Output will be here.</span>
+    </div>
+  </body>
+</html>

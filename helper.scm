@@ -1,0 +1,20 @@
+(define (length lst)
+  (if (null? lst)
+      0
+      (+ 1 (length (cdr lst)))))
+
+(define (rot13 str)
+  (define (rotate-char c)
+    (cond ((char<=? #\a c #\z)
+           (integer->char (+ (modulo (+ (- (char->integer c) (char->integer #\a)) 13) 26) 
+                            (char->integer #\a))))
+          ((char<=? #\A c #\Z)
+           (integer->char (+ (modulo (+ (- (char->integer c) (char->integer #\A)) 13) 26) 
+                            (char->integer #\A))))
+          (else c)))
+  (list->string (map rotate-char (string->list str))))
+
+(define (filter pred lst)
+  (cond ((null? lst) '())
+        ((pred (car lst)) (cons (car lst) (filter pred (cdr lst))))
+        (else (filter pred (cdr lst)))))

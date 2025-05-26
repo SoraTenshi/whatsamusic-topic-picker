@@ -1,0 +1,187 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #24283b;
+  color: #a9b1d6;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#fieldset {
+  background: #1a1b26;
+  border: 2px solid #414868;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+fieldset {
+  border: 1px solid #565f89;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: rgba(65, 72, 104, 0.1);
+}
+
+legend {
+  color: #bb9af7;
+  font-weight: bold;
+  padding: 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+fieldset > div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #7aa2f7;
+  cursor: pointer;
+}
+
+label {
+  color: #c0caf5;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+}
+
+button {
+  background: #7aa2f7;
+  border: none;
+  border-radius: 8px;
+  color: #1a1b26;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-family: inherit;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(122, 162, 247, 0.4);
+  background: #89b4fa;
+}
+
+button:active {
+  transform: translateY(-1px);
+}
+
+buton:disabled,
+button[disabled] {
+  background: #363b54;
+  color: #6b7089;
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: #414868;
+  box-shadow: none;
+  transform: none;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.buttons > button {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.clear {
+  background: #f7768e;
+}
+
+.clear:hover {
+  background: #ff7a93;
+  box-shadow: 0 4px 16px rgba(247, 118, 142, 0.4);
+}
+
+#output {
+  display: block;
+  background: rgba(65, 72, 104, 0.2);
+  border: 1px solid #414868;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #9ece6a;
+  font-size: 1.1rem;
+  font-weight: 500;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  word-wrap: break-word;
+  cursor: pointer;
+  user-select: text;
+  position: relative;
+}
+
+#output:hover {
+  background: rgba(65, 72, 104, 0.3);
+}
+
+#output:contains("All categories have been exhausted") {
+  color: #f7768e;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #565f89;
+  border: none;
+  border-radius: 4px;
+  color: #c0caf5;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  margin: 0;
+}
+
+#output:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  background: #6f7bb6;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  
+  #fieldset {
+    padding: 1.5rem;
+  }
+  
+  button {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+}
