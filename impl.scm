@@ -219,15 +219,19 @@
                                     " Song Nr. " (number->string song))))
                   (else "Unknown category")))))))
 
+(define (create-new-output content)
+  (let ((out (document.getElementById "output"))
+        (copy-btn (document.createElement "button")))
+    (set! copy-btn.className "copy-btn")
+    (set! copy-btn.textContent "Copy")
+    (set! copy-btn.onclick copy-to-clipboard)
+    (out.replaceChildren content)
+    (out.appendChild copy-btn)))
+
 (set! generate.onclick (lambda ()
-                         (let ((content (generate-random-category))
-                               (out (document.getElementById "output"))
-                               (copy-btn (document.createElement "button")))
-                           (set! copy-btn.className "copy-btn")
-                           (set! copy-btn.textContent "Copy")
-                           (set! copy-btn.onclick copy-to-clipboard)
-                           (out.replaceChildren content)
-                           (out.appendChild copy-btn))))
+                         (let ((content (generate-random-category)))
+                           (create-new-output content))))
+
 
 (define (clear-all-caches)
   (vector-fill! artist-used #f)
@@ -263,6 +267,8 @@
 
 (set! clear.onclick (lambda ()
                       (let ((is-ok (confirm "Are you sure? This will cause possible repeats.")))
-                        (if is-ok (clear-all-caches)))))
+                        (if is-ok (begin
+                            (clear-all-caches)
+                            (create-new-output "Output will be here."))))))
 
 (init-remaining-counts)
