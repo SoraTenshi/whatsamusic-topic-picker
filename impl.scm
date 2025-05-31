@@ -19,14 +19,15 @@
   '("irgendein Land" "'Liebe / Love'" "'Hass / Hate'" "irgendeine Zahl (als gesamter titel)"
     "irgendeine Jahreszeit" "'Junge / Boy'" "'Maedchen / Girl'" "irgendein Biom"
     "'Feuer / Fire'" "'Herz / Heart'" "'Regen / Rain'" "'Traum / Dream'" "irgendeine Stadt" "'Nacht / Night'" "'allein / alone'"
-    "Vor- / Nachname" "5 oder mehr Woerter im Titel" "Punktuierung / Sonderzeichen (nicht teil eines Scriptes)" "'Ich / I'" "'Du / You'"
-    "5 Buchstaben oder weniger" "irgendein Tier" "eine Wortwiederholung"))
+    "Vor- / Nachname" "5 oder mehr Woerter" "Punktuierung / Sonderzeichen (nicht teil eines Scriptes)" "'Ich / I'" "'Du / You'"
+    "5 Buchstaben oder weniger" "irgendein Tier" "eine Wortwiederholung" "einen Rechtschreibfehler" "eine Richtung"
+    "eine Farbe" "irgendein Wetterphaenomen" "'Himmel / Sky'" "Begruessung"))
 
 (define topics
   '("Lied zur Beerdigung" "Gaming" "Kulturell bereichernde Musik"
     "70s (1970-1979)" "80s (1980-1989)" "90s (1990-1999)" "00s (2000-2009)" "scuffed songtitel"
     "Meme songs" "toter Kuenstler" "SAUFLIEDER!!!!" "Lieder die man in der Dusche hoeren kann"
-    "Baustelle" "Jahreszeiten / Monate" "Lieder aus Medien" "Irgendwas mit Essen"
+    "Baustelle" "Jahreszeiten / Monate" "Lieder aus Medien" "Irgendwas mit Essen" "Irgendwas mit Trinken"
     "Lieder auf Deutsch"
     "Cover / Remix" "Unbekannte Songs von bekannten Kuenstler (1 Song >100m)" "Song mit Rechtschreibfehler"
     ;; TODO: Create own filter for Genre
@@ -46,12 +47,14 @@
 (define words-used '())
 (define topics-used '())
 (define daily-mix-used '())
+(define daylist-used '())
 
 (define artist-remaining 26)
 (define title-remaining 36)
 (define words-remaining 0)
 (define topics-remaining 0)
-(define daily-mix-remaining 300)
+(define daily-mix-remaining (* 50 6))
+(define daylist-remaining 50)
 
 (define artist-chars
   (let ((chars (make-vector 26)))
@@ -164,6 +167,19 @@
                 (set! daily-mix-remaining (- daily-mix-remaining 1))
                 (list mix song)))))))
 
+(define (random-daylist)
+  (if (<= daylist-remaining 0)
+      #f
+      (let loop ()
+        (let* ((song (+ 1 (fast-rand-int 50)))
+               (song-key (number->string song)))
+          (if (member-assoc song-key daylist-used)
+              (loop)
+              (begin
+                (set! daylist-used (add-to-used daylist-used song))
+                (set! daylist-remaining (- daylist-remaining 1))
+                song))))))
+
 (define (filter pred lst)
   (cond ((null? lst) '())
         ((pred (car lst)) (cons (car lst) (filter pred (cdr lst))))
@@ -179,8 +195,10 @@
         (set! available (cons 2 available)))
     (if (> words-remaining 0)
         (set! available (cons 3 available)))
-    (if (and (= max-roll 5) (> daily-mix-remaining 0))
+    (if (> daylist-remaining 0)
         (set! available (cons 4 available)))
+    (if (and (= max-roll 5) (> daily-mix-remaining 0))
+        (set! available (cons 5 available)))
     available))
 
 (define (preprocess-category max-roll version)
@@ -194,14 +212,15 @@
                         ((1) (random-unique-artist-char))
                         ((2) (random-topic is-nsfw))
                         ((3) (random-title is-nsfw))
-                        ((4) (random-daily-mix))
+                        ((4) (random-daylist))
+                        ((5) (random-daily-mix))
                         (else #f))))
           (if result
               (list chosen-version result)
               #f)))))
 
 (define (generate-random-category)
-  (let* ((max-roll (if is-spotify 5 4))
+  (let* ((max-roll (if is-spotify 6 4))
          (current-roll (fast-rand-int max-roll))
          (cat (preprocess-category max-roll current-roll)))
     (cond ((not cat) "All categories have been exhausted. Please clear the cache.")
@@ -212,7 +231,9 @@
                   ((= version 1) (string-append "Artist beginnt mit: " (string value)))
                   ((= version 2) (string-append "Topic: " value))
                   ((= version 3) (string-append "Songtitel muss " value " im titel haben."))
-                  ((= version 4)
+                  ;; Spotify only.
+                  ((= version 4) (string-append "Daylist Nr. " (number->string value) "."))
+                  ((= version 5)
                    (let ((mix (car value))
                          (song (cadr value)))
                      (string-append "Daily Mix " (number->string mix)
@@ -241,7 +262,8 @@
   (set! daily-mix-used '())
   (set! artist-remaining 26)
   (set! title-remaining 36)
-  (set! daily-mix-remaining 300)
+  (set! daily-mix-remaining (* 50 6))
+  (set! daylist-remaining 50)
   (init-remaining-counts))
 
 (define (select-output)
