@@ -60,13 +60,13 @@
   (let ((chars (make-vector 26)))
     (do ((i 0 (+ i 1)))
         ((= i 26) chars)
-      (vector-set! chars i (integer->char (+ (char->integer #\a) i))))))
+      (vector-set! chars i (integer->char (+ (char->integer #\A) i))))))
 
 (define title-chars
   (let ((chars (make-vector 36)))
     (do ((i 0 (+ i 1)))
         ((= i 26) chars)
-      (vector-set! chars i (integer->char (+ (char->integer #\a) i))))
+      (vector-set! chars i (integer->char (+ (char->integer #\A) i))))
     (do ((i 0 (+ i 1)))
         ((= i 10) chars)
       (vector-set! chars (+ i 26) (integer->char (+ (char->integer #\0) i))))
