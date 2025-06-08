@@ -195,9 +195,9 @@
         (set! available (cons 2 available)))
     (if (> words-remaining 0)
         (set! available (cons 3 available)))
-    (if (> daylist-remaining 0)
+    (if (and is-spotify (> daylist-remaining 0))
         (set! available (cons 4 available)))
-    (if (and (= max-roll 5) (> daily-mix-remaining 0))
+    (if (and is-spotify (> daily-mix-remaining 0))
         (set! available (cons 5 available)))
     available))
 
