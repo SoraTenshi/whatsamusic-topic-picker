@@ -5,15 +5,31 @@
 (define nsfw (document.getElementById "nsfw"))
 (define spotify (document.getElementById "spotify"))
 (define output (document.getElementById "output"))
+(define fta (document.getElementById "fta"))
+(define fts (document.getElementById "fts"))
+(define topic (document.getElementById "topic"))
+(define word-contained (document.getElementById "word-contained"))
 
 (define is-nsfw #f)
 (define is-spotify #f)
+(define is-first-char-title #t)
+(define is-first-char-artist #t)
+(define is-topic #t)
+(define is-word-contained #t)
 
 (set! nsfw.onchange (lambda ()
                       (set! is-nsfw nsfw.checked)
                       (init-remaining-counts)))
 (set! spotify.onchange (lambda ()
                          (set! is-spotify spotify.checked)))
+(set! fts.onchange (lambda ()
+                     (set! is-first-char-title fts.checked)))
+(set! fta.onchange (lambda ()
+                     (set! is-first-char-artist fta.checked)))
+(set! topic.onchange (lambda ()
+                     (set! is-topic topic.checked)))
+(set! word-contained.onchange (lambda ()
+                     (set! is-word-contained word-contained.checked)))
 
 (define words-in-title
   '("irgendein Land" "'Liebe / Love'" "'Hass / Hate'" "irgendeine Zahl (als gesamter titel)"
@@ -43,18 +59,20 @@
 (define topics-r18 (map rot13 topics-r18-obf))
 
 (define artist-used (make-vector 26 #f))
-(define title-used (make-vector 36 #f))
+(define title-used (make-vector 26 #f))
 (define words-used '())
 (define topics-used '())
 (define daily-mix-used '())
 (define daylist-used '())
+(define release-radar-used '())
 
 (define artist-remaining 26)
-(define title-remaining 36)
+(define title-remaining 26)
 (define words-remaining 0)
 (define topics-remaining 0)
 (define daily-mix-remaining (* 50 6))
 (define daylist-remaining 50)
+(define release-radar-remaining 30)
 
 (define artist-chars
   (let ((chars (make-vector 26)))
@@ -63,14 +81,10 @@
       (vector-set! chars i (integer->char (+ (char->integer #\A) i))))))
 
 (define title-chars
-  (let ((chars (make-vector 36)))
+  (let ((chars (make-vector 26)))
     (do ((i 0 (+ i 1)))
         ((= i 26) chars)
-      (vector-set! chars i (integer->char (+ (char->integer #\A) i))))
-    (do ((i 0 (+ i 1)))
-        ((= i 10) chars)
-      (vector-set! chars (+ i 26) (integer->char (+ (char->integer #\0) i))))
-    chars))
+      (vector-set! chars i (integer->char (+ (char->integer #\A) i))))))
 
 (define (fast-rand-int max)
   (floor (* (Math.random) max)))
@@ -78,7 +92,7 @@
 (random (Date.now))
 
 (define (init-remaining-counts)
-  (set! words-remaining (length (if is-nsfw 
+  (set! words-remaining (length (if is-nsfw
                                    (append words-in-title words-in-title-r18)
                                    words-in-title)))
   (set! topics-remaining (length (if is-nsfw
@@ -101,7 +115,7 @@
   (if (<= title-remaining 0)
       #f
       (let loop ()
-        (let ((idx (fast-rand-int 36)))
+        (let ((idx (fast-rand-int 26)))
           (if (vector-ref title-used idx)
               (loop)
               (begin
@@ -180,6 +194,19 @@
                 (set! daylist-remaining (- daylist-remaining 1))
                 song))))))
 
+(define (random-release-radar)
+  (if (<= release-radar-remaining 0)
+      #f
+      (let loop ()
+        (let* ((song (+ 1 (fast-rand-int 30)))
+               (song-key (number->string song)))
+          (if (member-assoc song-key daylist-used)
+              (loop)
+              (begin
+                (set! release-radar-used (add-to-used release-radar-used song))
+                (set! release-radar-remaining (- release-radar-remaining 1))
+                song))))))
+
 (define (filter pred lst)
   (cond ((null? lst) '())
         ((pred (car lst)) (cons (car lst) (filter pred (cdr lst))))
@@ -187,18 +214,20 @@
 
 (define (get-available-categories max-roll)
   (let ((available '()))
-    (if (> title-remaining 0)
+    (if (and is-first-char-title (> title-remaining 0))
         (set! available (cons 0 available)))
-    (if (> artist-remaining 0)
+    (if (and is-first-char-artist (> artist-remaining 0))
         (set! available (cons 1 available)))
-    (if (> topics-remaining 0)
+    (if (and is-topic (> topics-remaining 0))
         (set! available (cons 2 available)))
-    (if (> words-remaining 0)
+    (if (and is-word-contained (> words-remaining 0))
         (set! available (cons 3 available)))
     (if (and is-spotify (> daylist-remaining 0))
         (set! available (cons 4 available)))
     (if (and is-spotify (> daily-mix-remaining 0))
         (set! available (cons 5 available)))
+    (if (and is-spotify (> release-radar-remaining 0))
+        (set! available (cons 6 available)))
     available))
 
 (define (preprocess-category max-roll version)
@@ -214,16 +243,17 @@
                         ((3) (random-title is-nsfw))
                         ((4) (random-daylist))
                         ((5) (random-daily-mix))
+                        ((6) (random-release-radar))
                         (else #f))))
           (if result
               (list chosen-version result)
               #f)))))
 
 (define (generate-random-category)
-  (let* ((max-roll (if is-spotify 6 4))
+  (let* ((max-roll (if is-spotify 7 4))
          (current-roll (fast-rand-int max-roll))
          (cat (preprocess-category max-roll current-roll)))
-    (cond ((not cat) "All categories have been exhausted. Please clear the cache.")
+    (cond ((not cat) "All categories have been exhausted. Please clear the topics.")
           (else (let ((version (car cat))
                       (value (cadr cat)))
                 (cond
@@ -238,6 +268,7 @@
                          (song (cadr value)))
                      (string-append "Daily Mix " (number->string mix)
                                     " Song Nr. " (number->string song))))
+                  ((= version 6) (string-append "Release Radar Nr. " (number->string value) "."))
                   (else "Unknown category")))))))
 
 (define (create-new-output content)
