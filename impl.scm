@@ -32,7 +32,7 @@
                      (set! is-word-contained word-contained.checked)))
 
 (define words-in-title
-  '("irgendein Land" "'Liebe / Love'" "'Hass / Hate'" "irgendeine Zahl (als gesamter titel)"
+  '("irgendein Land" "'Liebe / Love'" "'Hass / Hate'" "irgendeine Zahl"
     "irgendeine Jahreszeit" "'Junge / Boy'" "'Maedchen / Girl'" "irgendein Biom"
     "'Feuer / Fire'" "'Herz / Heart'" "'Regen / Rain'" "'Traum / Dream'" "irgendeine Stadt" "'Nacht / Night'" "'allein / alone'"
     "Vor- / Nachname" "5 oder mehr Woerter" "Punktuierung / Sonderzeichen (nicht teil eines Scriptes)" "'Ich / I'" "'Du / You'"
@@ -47,7 +47,7 @@
     "Lieder auf Deutsch"
     "Cover / Remix" "Unbekannte Songs von bekannten Kuenstler (1 Song >100m)" "Song mit Rechtschreibfehler"
     ;; TODO: Create own filter for Genre
-    "Rock / Metal" "Elektronische Musik" "Pop"))
+    "Rock / Metal" "Elektronische Musik" "Pop" "Rap / Hip Hop"))
 
 (define words-in-title-r18-obf
   '("vetraqjrypur Qebtra" "vetraqjnf zvg Frk" "vetraqrva Nyubxby"))
