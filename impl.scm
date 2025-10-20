@@ -200,7 +200,7 @@
       (let loop ()
         (let* ((song (+ 1 (fast-rand-int 30)))
                (song-key (number->string song)))
-          (if (member-assoc song-key daylist-used)
+          (if (member-assoc song-key release-radar-used)
               (loop)
               (begin
                 (set! release-radar-used (add-to-used release-radar-used song))
