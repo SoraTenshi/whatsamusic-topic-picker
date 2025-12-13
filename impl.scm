@@ -9,6 +9,7 @@
 (define fts (document.getElementById "fts"))
 (define topic (document.getElementById "topic"))
 (define word-contained (document.getElementById "word-contained"))
+(define song-of-year (document.getElementById "song-of-year"))
 
 (define is-nsfw #f)
 (define is-spotify #f)
@@ -16,6 +17,7 @@
 (define is-first-char-artist #t)
 (define is-topic #t)
 (define is-word-contained #t)
+(define is-song-of-year #t)
 
 (set! nsfw.onchange (lambda ()
                       (set! is-nsfw nsfw.checked)
@@ -29,7 +31,9 @@
 (set! topic.onchange (lambda ()
                      (set! is-topic topic.checked)))
 (set! word-contained.onchange (lambda ()
-                     (set! is-word-contained word-contained.checked)))
+                                (set! is-word-contained word-contained.checked)))
+(set! song-of-year.onchange (lambda ()
+                              (set! is-song-of-year song-of-year.checked)))
 
 (define words-in-title
   '("irgendein Land" "'Liebe / Love'" "'Hass / Hate'" "irgendeine Zahl"
@@ -45,7 +49,7 @@
     "Meme songs" "toter Kuenstler" "SAUFLIEDER!!!!" "Lieder die man in der Dusche hoeren kann"
     "Baustelle" "Jahreszeiten / Monate" "Lieder aus Medien" "Irgendwas mit Essen" "Irgendwas mit Trinken"
     "Lieder auf Deutsch"
-    "Cover / Remix" "Unbekannte Songs von bekannten Kuenstler (1 Song >100m)" "Song mit Rechtschreibfehler"
+    "Cover / Remix" "Unbekannte Songs von bekannten Kuenstler (1 Song >100m)" "Song mit Rechtschreibfehler" "Weihnachtslieder"
     ;; TODO: Create own filter for Genre
     "Rock / Metal" "Elektronische Musik" "Pop" "Rap / Hip Hop"))
 
@@ -65,6 +69,7 @@
 (define daily-mix-used '())
 (define daylist-used '())
 (define release-radar-used '())
+(define song-of-year-used '())
 
 (define artist-remaining 26)
 (define title-remaining 26)
@@ -73,6 +78,7 @@
 (define daily-mix-remaining (* 50 6))
 (define daylist-remaining 50)
 (define release-radar-remaining 30)
+(define song-of-year-remaining 100)
 
 (define artist-chars
   (let ((chars (make-vector 26)))
@@ -194,6 +200,19 @@
                 (set! daylist-remaining (- daylist-remaining 1))
                 song))))))
 
+(define (random-song-of-year)
+  (if (<= song-of-year-remaining 0)
+      #f
+      (let loop ()
+        (let* ((song (+ 1 (fast-rand-int 100)))
+               (song-key (number->string song)))
+          (if (member-assoc song-key song-of-year-used)
+              (loop)
+              (begin
+                (set! song-of-year-used (add-to-used song-of-year-used song))
+                (set! song-of-year-remaining (- song-of-year-remaining 1))
+                song))))))
+
 (define (random-release-radar)
   (if (<= release-radar-remaining 0)
       #f
@@ -228,6 +247,8 @@
         (set! available (cons 5 available)))
     (if (and is-spotify (> release-radar-remaining 0))
         (set! available (cons 6 available)))
+    (if (and is-spotify (> song-of-year-remaining 0))
+        (set! available (cons 7 available)))
     available))
 
 (define (preprocess-category max-roll version)
@@ -244,13 +265,14 @@
                         ((4) (random-daylist))
                         ((5) (random-daily-mix))
                         ((6) (random-release-radar))
+                        ((7) (random-song-of-year))
                         (else #f))))
           (if result
               (list chosen-version result)
               #f)))))
 
 (define (generate-random-category)
-  (let* ((max-roll (if is-spotify 7 4))
+  (let* ((max-roll (if is-spotify 8 4))
          (current-roll (fast-rand-int max-roll))
          (cat (preprocess-category max-roll current-roll)))
     (cond ((not cat) "All categories have been exhausted. Please clear the topics.")
@@ -269,6 +291,7 @@
                      (string-append "Daily Mix " (number->string mix)
                                     " Song Nr. " (number->string song))))
                   ((= version 6) (string-append "Release Radar Nr. " (number->string value) "."))
+                  ((= version 7) (string-append "Top Songs 2025 Nr. " (number->string value) "."))
                   (else "Unknown category")))))))
 
 (define (create-new-output content)
@@ -295,6 +318,7 @@
   (set! title-remaining 36)
   (set! daily-mix-remaining (* 50 6))
   (set! daylist-remaining 50)
+  (set! song-of-year-remaining 100)
   (init-remaining-counts))
 
 (define (select-output)
